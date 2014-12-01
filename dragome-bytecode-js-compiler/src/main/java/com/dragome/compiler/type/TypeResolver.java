@@ -7,6 +7,7 @@ import org.xmlvm.ClassToJs;
 import com.dragome.compiler.DragomeJsCompiler;
 import com.dragome.compiler.Project;
 import com.dragome.compiler.ast.TypeDeclaration;
+import com.dragome.compiler.exceptions.UnableToParseException;
 import com.dragome.compiler.generators.AbstractVisitor;
 import com.dragome.compiler.parser.Parser;
 import com.dragome.compiler.units.ClassUnit;
@@ -82,9 +83,15 @@ public class TypeResolver implements TypeVisitor
 		{
 			typeDecl= parse(classUnit);
 		}
+		catch (UnableToParseException e)
+		{
+			Log.getLogger().warn(e.getMessage());
+
+			return;
+		}
 		catch (Exception e)
 		{
-		    Log.getLogger().debug("parse error:" + e.getMessage(), e);
+			Log.getLogger().debug("parse error:" + e.getMessage(), e);
 		}
 
 		{
@@ -101,7 +108,7 @@ public class TypeResolver implements TypeVisitor
 		}
 	}
 
-	private TypeDeclaration parse(ClassUnit classUnit)
+	private TypeDeclaration parse(ClassUnit classUnit) throws UnableToParseException
 	{
 		Parser parser= new Parser(classUnit);
 		TypeDeclaration typeDecl= parser.parse();

@@ -71,6 +71,7 @@ import com.dragome.compiler.ast.ReturnStatement;
 import com.dragome.compiler.ast.ThrowStatement;
 import com.dragome.compiler.ast.TypeDeclaration;
 import com.dragome.compiler.ast.VariableDeclaration;
+import com.dragome.compiler.exceptions.UnableToParseException;
 import com.dragome.compiler.exceptions.UnhandledCompilerProblemException;
 import com.dragome.compiler.generators.DragomeJavaScriptGenerator;
 import com.dragome.compiler.invokedynamic.InvokeDynamicBackporter;
@@ -100,7 +101,7 @@ public class Parser
 
 	InvokeDynamicBackporter lambdaUsageBackporter= new InvokeDynamicBackporter();
 
-	public Parser(ClassUnit theFileUnit)
+	public Parser(ClassUnit theFileUnit) throws UnableToParseException
 	{
 
 		fileUnit= theFileUnit;
@@ -134,7 +135,7 @@ public class Parser
 			throw new RuntimeException(e);
 		}
 	}
-	public TypeDeclaration parse()
+	public TypeDeclaration parse() throws UnableToParseException
 	{
 		DescendingVisitor classWalker= new DescendingVisitor(jc, new EmptyVisitor()
 		{
@@ -154,7 +155,7 @@ public class Parser
 		TypeDeclaration typeDecl= new TypeDeclaration(type, jc.getAccessFlags(), annotationsValues);
 
 		if (annotationsValues.containsKey(DONTPARSE))
-			return typeDecl;
+			throw new UnableToParseException("Can't parse " + jc.getClassName() + ". " + DONTPARSE + " found");
 
 		Project.singleton.addTypeAnnotations(typeDecl);
 
@@ -201,7 +202,10 @@ public class Parser
 			Map<String, String> methodAnnotationsValues= getAnnotationsValues(attributes);
 
 			if (methodAnnotationsValues.containsKey(DONTPARSE))
+			{
+				Log.getLogger().warn("Can't parse: " + method.getName() + "." + DONTPARSE + " found");
 				continue;
+			}
 
 			MethodBinding binding= MethodBinding.lookup(jc.getClassName(), method.getName(), method.getSignature());
 
