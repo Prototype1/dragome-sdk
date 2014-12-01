@@ -152,6 +152,10 @@ public class Parser
 		ObjectType type= new ObjectType(jc.getClassName());
 		Map<String, String> annotationsValues= getAnnotationsValues(jc.getAttributes());
 		TypeDeclaration typeDecl= new TypeDeclaration(type, jc.getAccessFlags(), annotationsValues);
+
+		if (annotationsValues.containsKey(DONTPARSE))
+			return typeDecl;
+
 		Project.singleton.addTypeAnnotations(typeDecl);
 
 		fileUnit.isInterface= Modifier.isInterface(typeDecl.getAccess());
@@ -195,6 +199,9 @@ public class Parser
 			Attribute[] attributes= method.getAttributes();
 
 			Map<String, String> methodAnnotationsValues= getAnnotationsValues(attributes);
+
+			if (methodAnnotationsValues.containsKey(DONTPARSE))
+				continue;
 
 			MethodBinding binding= MethodBinding.lookup(jc.getClassName(), method.getName(), method.getSignature());
 
