@@ -59,6 +59,7 @@ import org.apache.bcel.generic.Type;
 import org.apache.commons.io.IOUtils;
 
 import com.dragome.commons.compiler.annotations.CompilerType;
+import com.dragome.commons.compiler.annotations.ServerOnly;
 import com.dragome.compiler.DragomeJsCompiler;
 import com.dragome.compiler.Project;
 import com.dragome.compiler.annotations.AnnotationReader;
@@ -81,6 +82,8 @@ import com.dragome.compiler.utils.Utils;
 
 public class Parser
 {
+	//Get annotation name 
+	public final static String DONTPARSE= ServerOnly.class.getName();
 
 	public static String getResourcePath(String name)
 	{
@@ -99,6 +102,7 @@ public class Parser
 
 	public Parser(ClassUnit theFileUnit)
 	{
+
 		fileUnit= theFileUnit;
 		fileUnit.annotations= null;
 
