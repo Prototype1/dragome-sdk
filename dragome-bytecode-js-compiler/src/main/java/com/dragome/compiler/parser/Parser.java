@@ -151,6 +151,7 @@ public class Parser
 		org.apache.bcel.classfile.Method[] bcelMethods= jc.getMethods();
 
 		ObjectType type= new ObjectType(jc.getClassName());
+
 		Map<String, String> annotationsValues= getAnnotationsValues(jc.getAttributes());
 		TypeDeclaration typeDecl= new TypeDeclaration(type, jc.getAccessFlags(), annotationsValues);
 
@@ -259,6 +260,28 @@ public class Parser
 				}
 			}
 		}
+		return result;
+	}
+
+	//TODO TEST, simpler and faster solution then method above 
+	private Map<String, String> getAnnotationsValue(AnnotationEntry... entries)
+	{
+		Map<String, String> result= new LinkedHashMap<String, String>();
+		for (AnnotationEntry entry : entries)
+		{
+			if (entry.getElementValuePairs().length == 0)
+			{
+				result.put(Type.getType(entry.getAnnotationType()) + "# ", " ");
+				continue;
+			}
+			for (ElementValuePair pair : entry.getElementValuePairs())
+			{
+
+				result.put(Type.getType(entry.getAnnotationType()) + "#" + pair.getNameString(), pair.getValue().toString());
+			}
+
+		}
+
 		return result;
 	}
 
