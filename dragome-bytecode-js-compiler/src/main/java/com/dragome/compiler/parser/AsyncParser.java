@@ -1,42 +1,11 @@
-/*******************************************************************************
- * Copyright (c) 2011-2014 Fernando Petrola
- * 
- * This file is part of Dragome SDK.
- * 
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the GNU Public License v3.0
- * which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/gpl.html
- ******************************************************************************/
-
-// Copyright 2011 The j2js Authors. All Rights Reserved.
-//
-// This file is part of j2js.
-//
-// j2js is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// j2js is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with j2js. If not, see <http://www.gnu.org/licenses/>.
-
 package com.dragome.compiler.parser;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintStream;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,7 +27,6 @@ import org.apache.bcel.generic.ObjectType;
 import org.apache.bcel.generic.Type;
 import org.apache.commons.io.IOUtils;
 
-import com.dragome.commons.compiler.annotations.CompilerType;
 import com.dragome.commons.compiler.annotations.ServerOnly;
 import com.dragome.compiler.DragomeJsCompiler;
 import com.dragome.compiler.Project;
@@ -68,23 +36,32 @@ import com.dragome.compiler.ast.Block;
 import com.dragome.compiler.ast.MethodBinding;
 import com.dragome.compiler.ast.MethodDeclaration;
 import com.dragome.compiler.ast.ReturnStatement;
-import com.dragome.compiler.ast.ThrowStatement;
 import com.dragome.compiler.ast.TypeDeclaration;
 import com.dragome.compiler.ast.VariableDeclaration;
+import com.dragome.compiler.exceptions.FatalParseException;
 import com.dragome.compiler.exceptions.ServerInClientCode;
 import com.dragome.compiler.exceptions.UnhandledCompilerProblemException;
 import com.dragome.compiler.generators.DragomeJavaScriptGenerator;
 import com.dragome.compiler.invokedynamic.InvokeDynamicBackporter;
+import com.dragome.compiler.task.Parsable;
 import com.dragome.compiler.type.Signature;
 import com.dragome.compiler.units.ClassUnit;
-import com.dragome.compiler.utils.FileObject;
 import com.dragome.compiler.utils.Log;
 import com.dragome.compiler.utils.Utils;
 
-public class Parser
+public class AsyncParser implements Parsable<ClassUnit>
 {
-	//Get annotation name 
 	public final static String DONTPARSE= ServerOnly.class.getName();
+
+	private final InvokeDynamicBackporter lambdaUsageBackporter;
+
+	private JavaClass jc;
+	private ClassUnit fileUnit;
+
+	public AsyncParser()
+	{
+		lambdaUsageBackporter= new InvokeDynamicBackporter();
+	}
 
 	public static String getResourcePath(String name)
 	{
@@ -95,47 +72,8 @@ public class Parser
 		return url.getPath();
 	}
 
-	private JavaClass jc;
-
-	private ClassUnit fileUnit;
-
-	InvokeDynamicBackporter lambdaUsageBackporter= new InvokeDynamicBackporter();
-
-	public Parser(ClassUnit theFileUnit) throws ServerInClientCode
-	{
-
-		fileUnit= theFileUnit;
-		fileUnit.annotations= null;
-
-		AttributeReader r= new AnnotationReader(fileUnit);
-		Attribute.addAttributeReader("RuntimeVisibleAnnotations", r);
-
-		try
-		{
-			InputStream openInputStream= fileUnit.getClassFile().openInputStream();
-
-			String filename= fileUnit.getName();
-			byte[] originalByteArray= IOUtils.toByteArray(openInputStream);
-			byte[] transformedArray= originalByteArray;
-
-			transformedArray= lambdaUsageBackporter.transform(filename, transformedArray);
-
-			if (DragomeJsCompiler.compiler.bytecodeTransformer != null)
-				if (DragomeJsCompiler.compiler.bytecodeTransformer.requiresTransformation(filename))
-					transformedArray= DragomeJsCompiler.compiler.bytecodeTransformer.transform(filename, transformedArray);
-
-			fileUnit.setBytecodeArrayI(transformedArray);
-
-			ClassParser cp= new ClassParser(new ByteArrayInputStream(transformedArray), filename);
-			jc= cp.parse();
-
-		}
-		catch (IOException e)
-		{
-			throw new RuntimeException(e);
-		}
-	}
-	public TypeDeclaration parse() throws ServerInClientCode
+	@Override
+	public TypeDeclaration parse() throws ServerInClientCode, FatalParseException
 	{
 		DescendingVisitor classWalker= new DescendingVisitor(jc, new EmptyVisitor()
 		{
@@ -152,7 +90,7 @@ public class Parser
 
 		ObjectType type= new ObjectType(jc.getClassName());
 
-		Map<String, String> annotationsValues= getAnnotationsValues(jc.getAttributes());
+		Map<String, String> annotationsValues= getAnnotationsValues(collectEntries(jc.getAttributes()));
 		TypeDeclaration typeDecl= new TypeDeclaration(type, jc.getAccessFlags(), annotationsValues);
 
 		if (annotationsValues.containsKey(DONTPARSE))
@@ -198,9 +136,7 @@ public class Parser
 		{
 			Method method= bcelMethods[i];
 
-			Attribute[] attributes= method.getAttributes();
-
-			Map<String, String> methodAnnotationsValues= getAnnotationsValues(attributes);
+			Map<String, String> methodAnnotationsValues= getAnnotationsValues(collectEntries(method.getAttributes()));
 
 			if (methodAnnotationsValues.containsKey(DONTPARSE))
 			{
@@ -237,34 +173,35 @@ public class Parser
 		return typeDecl;
 	}
 
-	private Map<String, String> getAnnotationsValues(Attribute[] attributes)
+	@Override
+	public void prepareParsing(ClassUnit t) throws Exception
 	{
-		Map<String, String> result= new LinkedHashMap<String, String>();
-		for (Attribute attribute : attributes)
-		{
-			if (attribute instanceof Annotations)
-			{
-				Annotations annotations= (Annotations) attribute;
-				AnnotationEntry[] entries= annotations.getAnnotationEntries();
-				List<AnnotationEntry> newEntries= new ArrayList<AnnotationEntry>();
-				for (AnnotationEntry entry : entries)
-				{
-					if (entry.getElementValuePairs().length == 0)
-						result.put(Type.getType(entry.getAnnotationType()) + "# ", " ");
+		fileUnit= t;
+		fileUnit.annotations= null;
 
-					for (int i= 0; i < entry.getElementValuePairs().length; i++)
-					{
-						ElementValuePair elementValuePair= entry.getElementValuePairs()[i];
-						result.put(Type.getType(entry.getAnnotationType()) + "#" + elementValuePair.getNameString(), elementValuePair.getValue().toString());
-					}
-				}
-			}
-		}
-		return result;
+		AttributeReader r= new AnnotationReader(fileUnit);
+		Attribute.addAttributeReader("RuntimeVisibleAnnotations", r);
+
+		InputStream openInputStream= fileUnit.getClassFile().openInputStream();
+
+		String filename= fileUnit.getName();
+		byte[] originalByteArray= IOUtils.toByteArray(openInputStream);
+		byte[] transformedArray= originalByteArray;
+
+		transformedArray= lambdaUsageBackporter.transform(filename, transformedArray);
+
+		if (DragomeJsCompiler.compiler.bytecodeTransformer != null)
+			if (DragomeJsCompiler.compiler.bytecodeTransformer.requiresTransformation(filename))
+				transformedArray= DragomeJsCompiler.compiler.bytecodeTransformer.transform(filename, transformedArray);
+
+		fileUnit.setBytecodeArrayI(transformedArray);
+
+		ClassParser cp= new ClassParser(new ByteArrayInputStream(transformedArray), filename);
+		jc= cp.parse();
+
 	}
 
-	//TODO TEST, simpler and faster solution then method above 
-	private Map<String, String> getAnnotationsValues(AnnotationEntry... entries)
+	private Map<String, String> getAnnotationsValues(Collection<AnnotationEntry> entries)
 	{
 		Map<String, String> result= new LinkedHashMap<String, String>();
 		for (AnnotationEntry entry : entries)
@@ -313,53 +250,46 @@ public class Parser
 
 		Log.getLogger().debug("Parsing " + methodDecl.toString());
 		Pass1 pass1= new Pass1(jc);
+		ASTNode node= null;
 
 		try
 		{
 			pass1.parse(method, methodDecl);
 		}
-		catch (Throwable ex)
+		catch (UnhandledCompilerProblemException ex)
 		{
-			if (ex instanceof UnhandledCompilerProblemException)
+			Pass1.setClassNotReversible(methodDecl);
+		}
+
+		catch (ParseException e)
+		{
+			node= e.getAstNode();
+		}
+		catch (Exception e)
+		{
+			node= Pass1.getCurrentNode();
+
+			if (DragomeJsCompiler.compiler.isFailOnError())
 			{
-				Pass1.setClassNotReversible(methodDecl);
+				throw Utils.generateException(e, methodDecl, node);
 			}
 			else
 			{
-				ASTNode node= null;
-				if (ex instanceof ParseException)
-				{
-					node= ((ParseException) ex).getAstNode();
-				}
-				else
-				{
-					node= Pass1.getCurrentNode();
-				}
-
-				if (DragomeJsCompiler.compiler.isFailOnError())
-				{
-					throw Utils.generateException(ex, methodDecl, node);
-				}
-				else
-				{
-					fileUnit.addNotReversibleMethod(Pass1.extractMethodNameSignature(methodDecl.getMethodBinding()));
-					//String msg= Utils.generateExceptionMessage(methodDecl, node);
-					//DragomeJsCompiler.errorCount++;
-					//		    Log.getLogger().error(msg + "\n" + Utils.stackTraceToString(ex));
-				}
-
+				fileUnit.addNotReversibleMethod(Pass1.extractMethodNameSignature(methodDecl.getMethodBinding()));
+				//String msg= Utils.generateExceptionMessage(methodDecl, node);
+				//DragomeJsCompiler.errorCount++;
+				//		    Log.getLogger().error(msg + "\n" + Utils.stackTraceToString(ex));
 			}
-			Block body= new Block();
-			ThrowStatement throwStmt= new ThrowStatement();
-			/*
-			MethodBinding binding= MethodBinding.lookup("java.lang.RuntimeException", "<init>", "(java/lang/String)V;");
-			ClassInstanceCreation cic= new ClassInstanceCreation(methodDecl, binding);
-			cic.addArgument(new StringLiteral("Unresolved decompilation problem"));
-			throwStmt.setExpression(cic);
-			body.appendChild(throwStmt);*/
-			methodDecl.setBody(body);
 
 		}
+		Block body= new Block();
+		/*
+		MethodBinding binding= MethodBinding.lookup("java.lang.RuntimeException", "<init>", "(java/lang/String)V;");
+		ClassInstanceCreation cic= new ClassInstanceCreation(methodDecl, binding);
+		cic.addArgument(new StringLiteral("Unresolved decompilation problem"));
+		throwStmt.setExpression(cic);
+		body.appendChild(throwStmt);*/
+		methodDecl.setBody(body);
 
 		if (DragomeJsCompiler.compiler.optimize && methodDecl.getBody().getLastChild() instanceof ReturnStatement)
 		{
@@ -369,10 +299,23 @@ public class Parser
 				methodDecl.getBody().removeChild(ret);
 			}
 		}
+	}
 
-		//		Pass1.dump(methodDecl.getBody(), "Body of " + methodDecl.toString());
+	private static List<AnnotationEntry> collectEntries(Attribute... attributes)
+	{
+		List<AnnotationEntry> annotations= new ArrayList<>();
+		Annotations annotation;
+		for (Attribute attribute : attributes)
+		{
+			if (attribute instanceof Annotations)
+			{
+				annotation= (Annotations) attribute;
 
-		return;
+				annotations.addAll(Arrays.asList(annotation.getAnnotationEntries()));
+
+			}
+		}
+		return annotations;
 	}
 
 	public ConstantPool getConstantPool()
@@ -383,25 +326,6 @@ public class Parser
 	public String toString()
 	{
 		return jc.getClassName();
-	}
-
-	public static void main(String[] args) throws Exception
-	{
-		String className= args[0];
-		DragomeJsCompiler.compiler= new DragomeJsCompiler(CompilerType.Standard);
-
-		Project.createSingleton(null);
-		ClassUnit classUnit= new ClassUnit(Project.singleton, Project.singleton.getSignature(className));
-		classUnit.setClassFile(new FileObject(new File(args[1])));
-		Parser parser= new Parser(classUnit);
-		TypeDeclaration typeDecl= parser.parse();
-		DragomeJavaScriptGenerator dragomeJavaScriptGenerator= new DragomeJavaScriptGenerator(Project.singleton);
-		dragomeJavaScriptGenerator.setOutputStream(new PrintStream(new FileOutputStream(new File("/tmp/webapp.js"))));
-		dragomeJavaScriptGenerator.visit(typeDecl);
-
-		FileInputStream fis= new FileInputStream(new File("/tmp/webapp.js"));
-		String md5= org.apache.commons.codec.digest.DigestUtils.md5Hex(fis);
-		System.out.println(md5);
 	}
 
 }

@@ -1,6 +1,6 @@
 package com.dragome.compiler.exceptions;
 
-public class UnableToParseException extends Exception
+public class ServerInClientCode extends Exception
 {
 
 	/**
@@ -8,12 +8,12 @@ public class UnableToParseException extends Exception
 	 */
 	private static final long serialVersionUID= -7576634283217966457L;
 
-	public UnableToParseException(String message)
+	public ServerInClientCode(String message)
 	{
 		super(message);
 	}
 
-	public UnableToParseException(Throwable reason)
+	public ServerInClientCode(Throwable reason)
 	{
 		super(reason);
 	}
