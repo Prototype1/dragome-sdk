@@ -350,7 +350,6 @@ public class Parser
 
 			}
 			Block body= new Block();
-			ThrowStatement throwStmt= new ThrowStatement();
 			/*
 			MethodBinding binding= MethodBinding.lookup("java.lang.RuntimeException", "<init>", "(java/lang/String)V;");
 			ClassInstanceCreation cic= new ClassInstanceCreation(methodDecl, binding);

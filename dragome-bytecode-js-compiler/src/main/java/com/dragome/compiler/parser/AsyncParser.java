@@ -282,22 +282,23 @@ public class AsyncParser implements Parsable<ClassUnit>
 			}
 
 		}
-		Block body= new Block();
 		/*
 		MethodBinding binding= MethodBinding.lookup("java.lang.RuntimeException", "<init>", "(java/lang/String)V;");
 		ClassInstanceCreation cic= new ClassInstanceCreation(methodDecl, binding);
 		cic.addArgument(new StringLiteral("Unresolved decompilation problem"));
 		throwStmt.setExpression(cic);
 		body.appendChild(throwStmt);*/
-		methodDecl.setBody(body);
+		methodDecl.setBody(new Block());
 
-		if (DragomeJsCompiler.compiler.optimize && methodDecl.getBody().getLastChild() instanceof ReturnStatement)
+		ASTNode returnStatment= methodDecl.getBody().getLastChild();
+
+		if (DragomeJsCompiler.compiler.optimize && returnStatment instanceof ReturnStatement)
 		{
-			ReturnStatement ret= (ReturnStatement) methodDecl.getBody().getLastChild();
+			ReturnStatement ret= (ReturnStatement) returnStatment;
+
 			if (ret.getExpression() == null)
-			{
 				methodDecl.getBody().removeChild(ret);
-			}
+
 		}
 	}
 
