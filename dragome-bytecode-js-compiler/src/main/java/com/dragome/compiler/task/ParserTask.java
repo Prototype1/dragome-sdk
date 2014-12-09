@@ -1,5 +1,6 @@
 package com.dragome.compiler.task;
 
+import java.util.List;
 import java.util.concurrent.Callable;
 
 import com.dragome.compiler.ast.TypeDeclaration;
@@ -10,7 +11,7 @@ import com.dragome.compiler.ast.TypeDeclaration;
  *
  * @param <T>
  */
-public class ParserTask<T> implements Callable<TypeDeclaration>
+public class ParserTask<T> implements Callable<List<T>>
 {
 
 	private final Parsable<T> parser;
@@ -32,7 +33,7 @@ public class ParserTask<T> implements Callable<TypeDeclaration>
 	}
 
 	@Override
-	public TypeDeclaration call() throws Exception
+	public List<T> call() throws Exception
 	{
 		if (prepareFailReason != null)
 			throw prepareFailReason;
