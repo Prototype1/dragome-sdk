@@ -8,10 +8,13 @@
  * which accompanies this distribution, and is available at
  * http://www.gnu.org/licenses/gpl.html
  ******************************************************************************/
-package com.dragome.html.dom;
+package com.dragome.model.listeners;
 
-public interface EventDispatcher
+import java.util.EventListener;
+
+import com.dragome.model.MouseDownEvent;
+
+public interface MouseDownListener extends EventListener
 {
-	public void keyEventPerformedById(String eventName, String id, int code);
-	public void mouseEventPerformedById(String eventName, String id, int clientX, int clientY, boolean shiftKey);
+	void mouseDownPerformed(MouseDownEvent mouseDownEvent);
 }
