@@ -2,6 +2,7 @@ package com.dragome.compiler.parser.advanced;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -34,16 +35,29 @@ public class ParserManager
 		do
 		{
 
-			for (Future<List<Class<?>>> future : futures)
+			Iterator<Future<List<Class<?>>>> iter= futures.iterator();
+
+			while (iter.hasNext())
 			{
-				if (future.isDone())
-					finishedResults.addAll(getFutureAndHandleError(future));
+				Future<List<Class<?>>> currFuture= iter.next();
+
+				if (currFuture.isDone())
+				{
+					finishedResults.addAll(getFutureAndHandleError(currFuture));
+					iter.remove();
+
+				}
+				else if (currFuture.isCancelled())
+				{
+					iter.remove();
+				}
+
 			}
 
 			for (Class<?> currClass : finishedResults)
 			{
 				ParsedClasses.ACCESS().putClass(currClass);
-				
+
 				Future<List<Class<?>>> future= ThreadPool.PARSER_POOL.submitTask(new ParserTask<Class<?>>(new AsyncParser(), currClass));
 				futures.add(future);
 
