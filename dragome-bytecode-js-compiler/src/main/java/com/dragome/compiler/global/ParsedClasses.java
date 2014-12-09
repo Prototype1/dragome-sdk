@@ -24,9 +24,9 @@ public class ParsedClasses
 		// TODO Auto-generated constructor stub
 	}
 
-	public synchronized void putClass(String name, Class<?> clazz)
+	public synchronized void putClass(Class<?> clazz)
 	{
-		classes.put(name, clazz);
+		classes.put(clazz.getName(), clazz);
 	}
 
 	public Class<?> getClass(String name)
