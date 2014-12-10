@@ -16,7 +16,7 @@ public class ParserTask<T> implements Callable<List<T>>
 
 	private final Parsable<T> parser;
 
-	private Exception prepareFailReason= null;
+	private Exception prepareFailedReason= null;
 
 	public ParserTask(Parsable<T> parser, T data)
 	{
@@ -27,7 +27,7 @@ public class ParserTask<T> implements Callable<List<T>>
 		}
 		catch (Exception e)
 		{
-			prepareFailReason= e;
+			prepareFailedReason= e;
 		}
 
 	}
@@ -35,8 +35,8 @@ public class ParserTask<T> implements Callable<List<T>>
 	@Override
 	public List<T> call() throws Exception
 	{
-		if (prepareFailReason != null)
-			throw prepareFailReason;
+		if (prepareFailedReason != null)
+			throw prepareFailedReason;
 
 		return parser.parse();
 	}

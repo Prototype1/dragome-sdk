@@ -63,6 +63,9 @@ public class ParserManager
 
 			}
 
+			//all parsed classes were handeled 
+			finishedResults.clear();
+
 		}
 		while (ThreadPool.PARSER_POOL.hasTasks());
 
