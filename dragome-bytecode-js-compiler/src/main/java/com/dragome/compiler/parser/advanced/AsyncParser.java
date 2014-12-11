@@ -2,30 +2,33 @@ package com.dragome.compiler.parser.advanced;
 
 import java.util.List;
 
+import org.objectweb.asm.ClassReader;
+
 import com.dragome.compiler.exceptions.FatalParseException;
 import com.dragome.compiler.exceptions.ServerInClientCode;
 import com.dragome.compiler.task.Parsable;
 
-public class AsyncParser implements Parsable<Class<?>>
+public class AsyncParser implements Parsable<String>
 {
 
+	private ClassReader reader;
+	private AbstractByteCodeVisitor classVisitor;
+
 	@Override
-	public List<Class<?>> parse() throws ServerInClientCode, FatalParseException
+	public List<String> parse() throws ServerInClientCode, FatalParseException
 	{
-		// TODO Auto-generated method stub
+		reader.accept(classVisitor, 0);
+
+		classVisitor.getClassView();
+
 		return null;
 	}
-
 	@Override
-	public void prepareParsing(Class<?> t) throws Exception
+	public void prepareParsing(String className) throws Exception
 	{
-		// TODO Auto-generated method stub
-		
+		reader= new ClassReader(className);
+		classVisitor= new DragomeClassVisitor();
+
 	}
-
-	
-	
-
-
 
 }

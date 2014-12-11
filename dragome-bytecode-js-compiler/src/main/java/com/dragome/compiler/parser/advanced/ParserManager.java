@@ -14,32 +14,32 @@ import com.dragome.compiler.threadpool.ThreadPool;
 public class ParserManager
 {
 
-	private final Class<?> startingClass;
+	private final String startingClass;
 
-	public ParserManager(Class<?> startingClass)
+	public ParserManager(String startingClass)
 	{
 		this.startingClass= startingClass;
 	}
 
 	public void startParsing()
 	{
-		ParserTask<Class<?>> startingTask= new ParserTask<Class<?>>(new AsyncParser(), startingClass);
+		ParserTask<String> startingTask= new ParserTask<String>(new AsyncParser(), startingClass);
 
-		Future<List<Class<?>>> result= ThreadPool.PARSER_POOL.submitTask(startingTask);
+		Future<List<String>> result= ThreadPool.PARSER_POOL.submitTask(startingTask);
 
-		List<Future<List<Class<?>>>> futures= new ArrayList<>();
-		List<Class<?>> finishedResults= new ArrayList<>();
+		List<Future<List<String>>> futures= new ArrayList<>();
+		List<String> finishedResults= new ArrayList<>();
 
 		futures.add(result);
 
 		do
 		{
 
-			Iterator<Future<List<Class<?>>>> iter= futures.iterator();
+			Iterator<Future<List<String>>> iter= futures.iterator();
 
 			while (iter.hasNext())
 			{
-				Future<List<Class<?>>> currFuture= iter.next();
+				Future<List<String>> currFuture= iter.next();
 
 				if (currFuture.isDone())
 				{
@@ -54,11 +54,11 @@ public class ParserManager
 
 			}
 
-			for (Class<?> currClass : finishedResults)
+			for (String currClass : finishedResults)
 			{
-				ParsedClasses.ACCESS().putClass(currClass);
+				//				ParsedClasses.ACCESS().putClass(currClass);
 
-				Future<List<Class<?>>> future= ThreadPool.PARSER_POOL.submitTask(new ParserTask<Class<?>>(new AsyncParser(), currClass));
+				Future<List<String>> future= ThreadPool.PARSER_POOL.submitTask(new ParserTask<String>(new AsyncParser(), currClass));
 				futures.add(future);
 
 			}
@@ -71,7 +71,7 @@ public class ParserManager
 
 	}
 
-	private List<Class<?>> getFutureAndHandleError(Future<List<Class<?>>> future)
+	private List<String> getFutureAndHandleError(Future<List<String>> future)
 	{
 		try
 		{
