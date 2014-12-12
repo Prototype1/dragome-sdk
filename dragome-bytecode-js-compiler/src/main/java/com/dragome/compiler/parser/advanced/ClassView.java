@@ -5,13 +5,15 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import com.dragome.compiler.global.ValueType;
+
 /**
  * Subject of change. An class view for dragome carries everything the compiler should know to generate javascript out of it 
  * @author Mo
  *
  */
 
-public class ClassView
+public class ClassView extends ValueType
 {
 	private final String className;
 
@@ -97,6 +99,13 @@ public class ClassView
 
 		return Collections.unmodifiableList(l);
 
+	}
+
+	@Override
+	public boolean isObject()
+	{
+
+		return true;
 	}
 
 }
