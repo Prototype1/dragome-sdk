@@ -3,20 +3,20 @@ package com.dragome.compiler.model.valueTypes;
 import com.dragome.compiler.model.TypeInfo;
 import com.dragome.compiler.model.ValueType;
 
-public class NullValue extends ValueType
+public class VoidValue extends ValueType
 {
 
-	public NullValue()
+	public VoidValue()
 	{
-		super(TypeInfo.NULL);
-
+		super(TypeInfo.VOID);
+		// TODO Auto-generated constructor stub
 	}
 
 	@Override
 	public String toString()
 	{
-	
-		return "null";
+		
+		return Void.TYPE.getName();
 	}
 
 }

@@ -51,5 +51,7 @@ public abstract class ValueType
 	{
 		return Collections.unmodifiableCollection(annotations);
 	}
+	
+	public abstract String toString(); 
 
 }
