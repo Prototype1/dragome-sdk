@@ -1,11 +1,12 @@
-package com.dragome.compiler.parser.advanced;
+package com.dragome.compiler.model.valueTypes;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import com.dragome.compiler.global.ValueType;
+import com.dragome.compiler.model.MethodReference;
+import com.dragome.compiler.model.ValueType;
 
 /**
  * Subject of change. An class view for dragome carries everything the compiler should know to generate javascript out of it 
@@ -13,24 +14,24 @@ import com.dragome.compiler.global.ValueType;
  *
  */
 
-public class ClassView extends ValueType
+public class ClassValue extends ValueType
 {
 	private final String className;
 
-	private List<ClassView> implementsInterfaces= new ArrayList<>();
-	private ClassView extendsClass;
+	private List<ClassValue> implementsInterfaces= new ArrayList<>();
+	private ClassValue extendsClass;
 
-	private List<ClassView> instanceVars;
+	private List<ClassValue> instanceVars;
 	//TODO change object to something meaningful 
 	private List<Object> methods= new ArrayList<>();
-	private List<Object> constructors= new ArrayList<>();
 	private List<Object> classAnnotations= new ArrayList<>();
 
 	//needed? tells you in which context this objects are used 
-	private List<Object> usedInContext= new ArrayList<>();
+	private List<MethodReference> usedInContext= new ArrayList<>();
 
-	public ClassView(String className)
+	public ClassValue(String className)
 	{
+		super(true);
 		if (className == null)
 			throw new IllegalArgumentException("ClassView could not be created");
 
@@ -39,7 +40,7 @@ public class ClassView extends ValueType
 
 	//List operations. Returns only a view of the Lists to avoid unwanted manipulations 
 
-	public ClassView addMethods(Collection<Object> methods)
+	public ClassValue addMethods(Collection<Object> methods)
 	{
 		if (methods != null)
 			this.methods.addAll(methods);
@@ -47,7 +48,7 @@ public class ClassView extends ValueType
 		return this;
 	}
 
-	public ClassView addClassAnnotations(Collection<Object> classAnnotation)
+	public ClassValue addClassAnnotations(Collection<Object> classAnnotation)
 	{
 
 		if (classAnnotation != null)
@@ -56,7 +57,7 @@ public class ClassView extends ValueType
 		return this;
 	}
 
-	public ClassView addInterfaces(Collection<ClassView> interfaces)
+	public ClassValue addInterfaces(Collection<ClassValue> interfaces)
 	{
 
 		if (interfaces != null)
@@ -65,7 +66,7 @@ public class ClassView extends ValueType
 		return this;
 	}
 
-	public void addExtendedClass(ClassView extendsClass)
+	public void addExtendedClass(ClassValue extendsClass)
 	{
 		this.extendsClass= extendsClass;
 	}
@@ -90,22 +91,15 @@ public class ClassView extends ValueType
 		return !classAnnotations.isEmpty();
 	}
 
-	public Collection<ClassView> getDependenciesToParse()
+	public Collection<ClassValue> getDependenciesToParse()
 	{
-		List<ClassView> l= new ArrayList<>(implementsInterfaces);
+		List<ClassValue> l= new ArrayList<>(implementsInterfaces);
 
 		if (extendsClass != null)
 			l.add(extendsClass);
 
 		return Collections.unmodifiableList(l);
 
-	}
-
-	@Override
-	public boolean isObject()
-	{
-
-		return true;
 	}
 
 }

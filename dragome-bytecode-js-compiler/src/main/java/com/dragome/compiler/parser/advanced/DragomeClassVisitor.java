@@ -2,11 +2,13 @@ package com.dragome.compiler.parser.advanced;
 
 import org.objectweb.asm.Opcodes;
 
+import com.dragome.compiler.model.valueTypes.ClassValue;
+
 public class DragomeClassVisitor extends AbstractByteCodeVisitor
 {
 
 	
-	private  ClassView classView; 
+	private  ClassValue classView; 
 	
 	
 	public DragomeClassVisitor()
@@ -21,7 +23,7 @@ public class DragomeClassVisitor extends AbstractByteCodeVisitor
 	public void visit(int version, int access, String name, String signature, String superName, String[] interfaces)
 	{
 		
-		classView = new ClassView(name);
+		classView = new ClassValue(name);
 		
 		
 		
@@ -30,7 +32,7 @@ public class DragomeClassVisitor extends AbstractByteCodeVisitor
 	
 
 	@Override
-	public ClassView getClassView()
+	public ClassValue getClassView()
 	{
 		// TODO Auto-generated method stub
 		return null;
