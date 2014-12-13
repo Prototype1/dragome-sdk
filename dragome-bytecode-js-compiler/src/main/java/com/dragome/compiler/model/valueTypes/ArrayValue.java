@@ -3,12 +3,12 @@ package com.dragome.compiler.model.valueTypes;
 import com.dragome.compiler.model.TypeInfo;
 import com.dragome.compiler.model.ValueType;
 
-public class PrimaryValue extends ValueType
+public class ArrayValue extends ValueType
 {
 
-	public PrimaryValue()
+	public ArrayValue()
 	{
-		super(TypeInfo.PRIMARY);
+		super(TypeInfo.ARRAY);
 		// TODO Auto-generated constructor stub
 	}
 
