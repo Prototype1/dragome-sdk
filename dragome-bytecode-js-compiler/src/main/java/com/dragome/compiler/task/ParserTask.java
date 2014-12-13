@@ -11,14 +11,14 @@ import com.dragome.compiler.ast.TypeDeclaration;
  *
  * @param <T>
  */
-public class ParserTask<T> implements Callable<List<T>>
+public class ParserTask<R,T> implements Callable<List<R>>
 {
 
-	private final Parsable<T> parser;
+	private final Parsable<R,T> parser;
 
 	private Exception prepareFailedReason= null;
 
-	public ParserTask(Parsable<T> parser, T data)
+	public ParserTask(Parsable<R,T> parser, T data)
 	{
 		this.parser= parser;
 		try
@@ -33,7 +33,7 @@ public class ParserTask<T> implements Callable<List<T>>
 	}
 
 	@Override
-	public List<T> call() throws Exception
+	public List<R> call() throws Exception
 	{
 		if (prepareFailedReason != null)
 			throw prepareFailedReason;
