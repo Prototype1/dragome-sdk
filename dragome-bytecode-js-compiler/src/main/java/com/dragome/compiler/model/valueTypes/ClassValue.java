@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import com.dragome.compiler.model.MethodReference;
+import com.dragome.compiler.model.TypeInfo;
 import com.dragome.compiler.model.ValueType;
 
 /**
@@ -21,17 +21,12 @@ public class ClassValue extends ValueType
 	private List<ClassValue> implementsInterfaces= new ArrayList<>();
 	private ClassValue extendsClass;
 
-	private List<ClassValue> instanceVars;
-	//TODO change object to something meaningful 
+	private List<ValueType> instanceVars= new ArrayList<>();
 	private List<Object> methods= new ArrayList<>();
-	private List<Object> classAnnotations= new ArrayList<>();
-
-	//needed? tells you in which context this objects are used 
-	private List<MethodReference> usedInContext= new ArrayList<>();
 
 	public ClassValue(String className)
 	{
-		super(true);
+		super(TypeInfo.OBJECT);
 		if (className == null)
 			throw new IllegalArgumentException("ClassView could not be created");
 
@@ -52,7 +47,7 @@ public class ClassValue extends ValueType
 	{
 
 		if (classAnnotation != null)
-			this.classAnnotations.addAll(classAnnotation);
+			addAnnotations(classAnnotation);
 
 		return this;
 	}
@@ -88,7 +83,7 @@ public class ClassValue extends ValueType
 
 	public boolean hasClassAnnotation()
 	{
-		return !classAnnotations.isEmpty();
+		return !getAnnotation().isEmpty();
 	}
 
 	public Collection<ClassValue> getDependenciesToParse()
@@ -100,6 +95,11 @@ public class ClassValue extends ValueType
 
 		return Collections.unmodifiableList(l);
 
+	}
+
+	public String getClassName()
+	{
+		return className;
 	}
 
 }

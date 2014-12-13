@@ -1,4 +1,4 @@
-package com.dragome.compiler.global;
+package com.dragome.compiler.model;
 
 public enum ElementModifier
 {
