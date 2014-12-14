@@ -11,7 +11,7 @@ public class PrimitiveValue extends ValueType
 
 	public PrimitiveValue(PrimitiveInfo valueInfo)
 	{
-		super(TypeInfo.Primitiv);
+		super(TypeInfo.PRIMITIV);
 		this.valueInfo= valueInfo;
 
 	}

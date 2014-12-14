@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import com.dragome.compiler.model.MethodHolder;
 import com.dragome.compiler.model.TypeInfo;
 import com.dragome.compiler.model.ValueType;
 
@@ -22,7 +23,7 @@ public class ClassValue extends ValueType
 	private ClassValue extendsClass;
 
 	private List<ValueType> instanceVars= new ArrayList<>();
-	private List<Object> methods= new ArrayList<>();
+	private List<MethodHolder> methods= new ArrayList<>();
 
 	public ClassValue(String className)
 	{
@@ -35,7 +36,7 @@ public class ClassValue extends ValueType
 
 	//List operations. Returns only a view of the Lists to avoid unwanted manipulations 
 
-	public ClassValue addMethods(Collection<Object> methods)
+	public ClassValue addMethods(Collection<MethodHolder> methods)
 	{
 		if (methods != null)
 			this.methods.addAll(methods);
@@ -43,7 +44,7 @@ public class ClassValue extends ValueType
 		return this;
 	}
 
-	public ClassValue addClassAnnotations(Collection<Object> classAnnotation)
+	public ClassValue addClassAnnotations(Collection<AnnotationValue> classAnnotation)
 	{
 
 		if (classAnnotation != null)
