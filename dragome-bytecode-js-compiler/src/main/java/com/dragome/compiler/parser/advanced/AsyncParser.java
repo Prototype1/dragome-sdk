@@ -6,16 +6,17 @@ import org.objectweb.asm.ClassReader;
 
 import com.dragome.compiler.exceptions.FatalParseException;
 import com.dragome.compiler.exceptions.ServerInClientCode;
+import com.dragome.compiler.model.valueTypes.ClassValue;
 import com.dragome.compiler.task.Parsable;
 
-public class AsyncParser implements Parsable<String>
+public class AsyncParser implements Parsable<ClassValue, String>
 {
 
 	private ClassReader reader;
 	private AbstractByteCodeVisitor classVisitor;
 
 	@Override
-	public List<String> parse() throws ServerInClientCode, FatalParseException
+	public List<ClassValue> parse() throws ServerInClientCode, FatalParseException
 	{
 		reader.accept(classVisitor, 0);
 
@@ -24,9 +25,9 @@ public class AsyncParser implements Parsable<String>
 		return null;
 	}
 	@Override
-	public void prepareParsing(String className) throws Exception
+	public void prepareParsing(String clazz) throws Exception
 	{
-		reader= new ClassReader(className);
+		reader= new ClassReader(clazz);
 		classVisitor= new DragomeClassVisitor();
 
 	}
