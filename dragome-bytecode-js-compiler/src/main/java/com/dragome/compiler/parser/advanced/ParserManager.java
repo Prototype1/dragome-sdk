@@ -7,16 +7,9 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import com.dragome.compiler.model.valueTypes.ClassValue;
+import com.dragome.compiler.global.ParsedClasses;
 import com.dragome.compiler.task.ParserTask;
 import com.dragome.compiler.threadpool.ThreadPool;
-
-/**
- * TODO redesign
- * Subject to change
- * @author Mo
- *
- */
 
 public class ParserManager
 {
@@ -30,23 +23,23 @@ public class ParserManager
 
 	public void startParsing()
 	{
-		ParserTask<ClassValue, String> startingTask= new ParserTask<ClassValue, String>(new AsyncParser(), startingClass);
+		ParserTask<String> startingTask= new ParserTask<String>(new AsyncParser(), startingClass);
 
-		Future<List<ClassValue>> result= ThreadPool.PARSER_POOL.submitTask(startingTask);
+		Future<List<String>> result= ThreadPool.PARSER_POOL.submitTask(startingTask);
 
-		List<Future<List<ClassValue>>> futures= new ArrayList<>();
-		List<ClassValue> finishedResults= new ArrayList<>();
+		List<Future<List<String>>> futures= new ArrayList<>();
+		List<String> finishedResults= new ArrayList<>();
 
 		futures.add(result);
 
 		do
 		{
 
-			Iterator<Future<List<ClassValue>>> iter= futures.iterator();
+			Iterator<Future<List<String>>> iter= futures.iterator();
 
 			while (iter.hasNext())
 			{
-				Future<List<ClassValue>> currFuture= iter.next();
+				Future<List<String>> currFuture= iter.next();
 
 				if (currFuture.isDone())
 				{
@@ -61,11 +54,11 @@ public class ParserManager
 
 			}
 
-			for (ClassValue currClass : finishedResults)
+			for (String currClass : finishedResults)
 			{
 				//				ParsedClasses.ACCESS().putClass(currClass);
 
-				Future<List<ClassValue>> future= ThreadPool.PARSER_POOL.submitTask(new ParserTask<ClassValue, String>(new AsyncParser(), currClass.getClassName()));
+				Future<List<String>> future= ThreadPool.PARSER_POOL.submitTask(new ParserTask<String>(new AsyncParser(), currClass));
 				futures.add(future);
 
 			}
@@ -78,7 +71,7 @@ public class ParserManager
 
 	}
 
-	private List<ClassValue> getFutureAndHandleError(Future<List<ClassValue>> future)
+	private List<String> getFutureAndHandleError(Future<List<String>> future)
 	{
 		try
 		{
