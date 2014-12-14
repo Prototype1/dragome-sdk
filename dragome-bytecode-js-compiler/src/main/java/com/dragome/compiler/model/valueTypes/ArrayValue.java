@@ -11,7 +11,7 @@ public class ArrayValue extends ValueType
 	public ArrayValue()
 	{
 		super(TypeInfo.ARRAY);
-
+		// TODO Auto-generated constructor stub
 	}
 
 	@Override

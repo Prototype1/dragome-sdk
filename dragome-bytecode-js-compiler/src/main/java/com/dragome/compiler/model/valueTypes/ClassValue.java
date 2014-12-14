@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import com.dragome.compiler.model.MethodHolder;
 import com.dragome.compiler.model.TypeInfo;
 import com.dragome.compiler.model.ValueType;
 
@@ -20,10 +19,10 @@ public class ClassValue extends ValueType
 	private final String className;
 
 	private List<ClassValue> implementsInterfaces= new ArrayList<>();
-	private ClassValue parentClass;
+	private ClassValue extendsClass;
 
 	private List<ValueType> instanceVars= new ArrayList<>();
-	private List<MethodHolder> methods= new ArrayList<>();
+	private List<Object> methods= new ArrayList<>();
 
 	public ClassValue(String className)
 	{
@@ -36,7 +35,7 @@ public class ClassValue extends ValueType
 
 	//List operations. Returns only a view of the Lists to avoid unwanted manipulations 
 
-	public ClassValue addMethods(Collection<MethodHolder> methods)
+	public ClassValue addMethods(Collection<Object> methods)
 	{
 		if (methods != null)
 			this.methods.addAll(methods);
@@ -44,7 +43,7 @@ public class ClassValue extends ValueType
 		return this;
 	}
 
-	public ClassValue addClassAnnotations(Collection<AnnotationValue> classAnnotation)
+	public ClassValue addClassAnnotations(Collection<Object> classAnnotation)
 	{
 
 		if (classAnnotation != null)
@@ -62,9 +61,9 @@ public class ClassValue extends ValueType
 		return this;
 	}
 
-	public void addParentClass(ClassValue parantClass)
+	public void addExtendedClass(ClassValue extendsClass)
 	{
-		this.parentClass= parantClass;
+		this.extendsClass= extendsClass;
 	}
 
 	public boolean hasInstanceVars()
@@ -87,26 +86,15 @@ public class ClassValue extends ValueType
 		return !getAnnotation().isEmpty();
 	}
 
-	//TODO really needed ? 
 	public Collection<ClassValue> getDependenciesToParse()
 	{
 		List<ClassValue> l= new ArrayList<>(implementsInterfaces);
 
-		if (parentClass != null)
-			l.add(parentClass);
+		if (extendsClass != null)
+			l.add(extendsClass);
 
 		return Collections.unmodifiableList(l);
 
-	}
-
-	public Collection<MethodHolder> getMethods()
-	{
-		return Collections.unmodifiableCollection(methods);
-	}
-
-	public ClassValue getParent()
-	{
-		return parentClass;
 	}
 
 	public String getClassName()
