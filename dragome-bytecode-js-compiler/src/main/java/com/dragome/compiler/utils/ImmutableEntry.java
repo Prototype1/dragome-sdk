@@ -1,6 +1,6 @@
 package com.dragome.compiler.utils;
 
-public class ImmutableEntry<T1, T2>
+public final class ImmutableEntry<T1, T2>
 {
 
 	private final T1 t1;
