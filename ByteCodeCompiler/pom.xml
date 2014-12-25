@@ -6,6 +6,12 @@
 	<version>0.0.1-SNAPSHOT</version>
 
 
+	<properties>
+		<skip.gpg>true</skip.gpg>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+	</properties>
+
 	<dependencies>
 
 		<dependency>
@@ -19,7 +25,7 @@
 			<artifactId>asm</artifactId>
 			<version>5.0.3</version>
 		</dependency>
-		
+
 	</dependencies>
 
 </project>
