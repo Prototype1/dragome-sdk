@@ -1,7 +1,7 @@
 package dragome.compiler.model.values;
 
-import dragome.compiler.model.TypeInfo;
 import dragome.compiler.model.ValueType;
+import dragome.compiler.model.typeinfo.TypeInfo;
 
 public class VoidValue extends ValueType
 {

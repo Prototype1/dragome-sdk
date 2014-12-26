@@ -1,4 +1,4 @@
-package dragome.compiler.model;
+package dragome.compiler.model.typeinfo;
 
 import org.objectweb.asm.Type;
 
@@ -22,7 +22,7 @@ public enum TypeInfo
 				return TypeInfo.OBJECT;
 			case 11:
 				return TypeInfo.METHOD;
-
+			
 			default:
 
 				if (t >= 1 && t <= 8)

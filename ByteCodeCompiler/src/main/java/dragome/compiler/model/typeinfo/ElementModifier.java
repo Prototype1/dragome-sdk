@@ -1,4 +1,4 @@
-package dragome.compiler.model;
+package dragome.compiler.model.typeinfo;
 
 public enum ElementModifier
 {

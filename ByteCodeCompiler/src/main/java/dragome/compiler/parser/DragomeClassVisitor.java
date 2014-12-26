@@ -1,16 +1,23 @@
 package dragome.compiler.parser;
 
+import java.util.Collection;
+
+import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
+
+import dragome.compiler.model.MethodInfo;
 import dragome.compiler.model.values.ClassValue;
 
-public class DragomeClassVisitor extends AbstractByteCodeVisitor
+public class DragomeClassVisitor extends AbstractClassVisitor
 {
 
 	private ClassValue classView;
+	private final Collection<MethodInfo> methodsToParse;
 
-	public DragomeClassVisitor()
+	public DragomeClassVisitor(Collection<MethodInfo> methodsToParse)
 	{
 		super(Opcodes.ASM5);
+		this.methodsToParse= methodsToParse;
 
 	}
 
@@ -23,6 +30,16 @@ public class DragomeClassVisitor extends AbstractByteCodeVisitor
 		super.visit(version, access, name, signature, superName, interfaces);
 	}
 
+	@Override
+	public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions)
+	{
+		
+		if(!methodsToParse.contains(new MethodInfo(name)))
+			return null;
+		
+		return super.visitMethod(access, name, desc, signature, exceptions);
+	}
+	
 	@Override
 	public ClassValue getClassView()
 	{
