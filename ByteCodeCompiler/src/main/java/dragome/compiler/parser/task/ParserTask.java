@@ -13,9 +13,7 @@ public class ParserTask<R ,T> implements Callable<List<R>>
 {
 
 	private final Parsable<R, T> parser;
-
 	private Exception prepareFailedReason= null;
-
 	public ParserTask(Parsable<R, T> parser, T data)
 	{
 		this.parser= parser;

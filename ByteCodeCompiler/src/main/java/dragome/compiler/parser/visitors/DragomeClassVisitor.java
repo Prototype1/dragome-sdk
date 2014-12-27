@@ -1,4 +1,4 @@
-package dragome.compiler.parser;
+package dragome.compiler.parser.visitors;
 
 import java.util.Collection;
 

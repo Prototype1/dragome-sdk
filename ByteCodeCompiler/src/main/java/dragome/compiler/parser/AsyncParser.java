@@ -6,6 +6,8 @@ import org.objectweb.asm.ClassReader;
 
 import dragome.compiler.model.values.ClassValue;
 import dragome.compiler.parser.task.Parsable;
+import dragome.compiler.parser.visitors.AbstractClassVisitor;
+import dragome.compiler.parser.visitors.DragomeClassVisitor;
 
 public class AsyncParser implements Parsable<ClassValue, String>
 {
