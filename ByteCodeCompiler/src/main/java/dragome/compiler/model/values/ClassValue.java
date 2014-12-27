@@ -5,9 +5,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import dragome.compiler.model.MethodHolder;
-import dragome.compiler.model.ValueType;
+import dragome.compiler.model.method.MethodHolder;
 import dragome.compiler.model.typeinfo.TypeInfo;
+import dragome.compiler.model.typeinfo.ValueType;
 
 /**
  * Subject of change. An class view for dragome carries everything the compiler should know to generate javascript out of it 

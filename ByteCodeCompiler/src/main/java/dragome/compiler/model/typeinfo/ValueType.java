@@ -1,4 +1,4 @@
-package dragome.compiler.model;
+package dragome.compiler.model.typeinfo;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -6,9 +6,6 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 
-import dragome.compiler.model.typeinfo.AccessModifier;
-import dragome.compiler.model.typeinfo.ElementModifier;
-import dragome.compiler.model.typeinfo.TypeInfo;
 import dragome.compiler.model.values.AnnotationValue;
 
 public abstract class ValueType

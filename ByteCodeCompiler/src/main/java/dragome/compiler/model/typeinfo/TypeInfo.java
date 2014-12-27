@@ -4,7 +4,7 @@ import org.objectweb.asm.Type;
 
 public enum TypeInfo
 {
-	OBJECT, ARRAY, NULL, ANNOTATION, VOID, PRIMITIV, METHOD;
+	OBJECT, ARRAY, ANNOTATION, VOID, PRIMITIV, METHOD, NOTHING;
 
 	public TypeInfo createFromASMType(Type type)
 	{
@@ -22,13 +22,12 @@ public enum TypeInfo
 				return TypeInfo.OBJECT;
 			case 11:
 				return TypeInfo.METHOD;
-			
+
 			default:
 
 				if (t >= 1 && t <= 8)
 					return TypeInfo.PRIMITIV;
-				else
-					return TypeInfo.NULL;
+				return NOTHING;
 
 		}
 	}

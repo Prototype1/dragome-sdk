@@ -1,8 +1,8 @@
 package dragome.compiler.model.values;
 
-import dragome.compiler.model.ValueType;
 import dragome.compiler.model.typeinfo.PrimitiveInfo;
 import dragome.compiler.model.typeinfo.TypeInfo;
+import dragome.compiler.model.typeinfo.ValueType;
 
 public class PrimitiveValue extends ValueType
 {
