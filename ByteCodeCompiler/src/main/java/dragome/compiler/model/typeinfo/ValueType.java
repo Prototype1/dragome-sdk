@@ -7,19 +7,24 @@ import java.util.EnumSet;
 import java.util.List;
 
 import dragome.compiler.model.values.AnnotationValue;
+import dragome.compiler.parser.model.Scope;
 
 public abstract class ValueType
 {
 
 	private final TypeInfo typeInfo;
-	private AccessModifier accessModifier;
-
 	private final List<AnnotationValue> annotations= new ArrayList<>();
 	private final EnumSet<ElementModifier> elementModifiers= EnumSet.noneOf(ElementModifier.class);
+	private final String name;
 
-	public ValueType(TypeInfo typeInfo)
+	private AccessModifier accessModifier;
+	private Scope scope;
+	private Object initValue;
+
+	public ValueType(TypeInfo typeInfo, String name)
 	{
 		this.typeInfo= typeInfo;
+		this.name= name;
 
 	}
 
@@ -64,5 +69,25 @@ public abstract class ValueType
 	}
 
 	public abstract String toString();
+
+	public Object getInitValue()
+	{
+		return initValue;
+	}
+
+	public void setInitValue(Object initValue)
+	{
+		this.initValue= initValue;
+	}
+
+	public Scope getScope()
+	{
+		return scope;
+	}
+
+	public void setScope(Scope scope)
+	{
+		this.scope= scope;
+	}
 
 }

@@ -6,7 +6,7 @@ public enum TypeInfo
 {
 	OBJECT, ARRAY, ANNOTATION, VOID, PRIMITIV, METHOD, NOTHING;
 
-	public TypeInfo createFromASMType(Type type)
+	public static TypeInfo createFromASMType(Type type)
 	{
 
 		int t= type.getSort();

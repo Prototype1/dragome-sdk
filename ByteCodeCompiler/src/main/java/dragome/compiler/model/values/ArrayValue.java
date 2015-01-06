@@ -8,9 +8,9 @@ public class ArrayValue extends ValueType
 
 	private String typeOfArray;
 
-	public ArrayValue()
+	public ArrayValue(String name)
 	{
-		super(TypeInfo.ARRAY);
+		super(TypeInfo.ARRAY, name);
 		// TODO Auto-generated constructor stub
 	}
 

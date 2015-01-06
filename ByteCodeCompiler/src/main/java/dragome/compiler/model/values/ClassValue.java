@@ -25,9 +25,9 @@ public class ClassValue extends ValueType
 	private List<ValueType> instanceVars= new ArrayList<>();
 	private List<MethodHolder> methods= new ArrayList<>();
 
-	public ClassValue(String className)
+	public ClassValue(String className, String varName)
 	{
-		super(TypeInfo.OBJECT);
+		super(TypeInfo.OBJECT, varName);
 		if (className == null)
 			throw new IllegalArgumentException("ClassView could not be created");
 

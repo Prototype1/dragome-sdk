@@ -1,6 +1,5 @@
 package dragome.compiler.model.method;
 
-import dragome.compiler.model.values.ClassValue;
 
 public class MethodReference
 {

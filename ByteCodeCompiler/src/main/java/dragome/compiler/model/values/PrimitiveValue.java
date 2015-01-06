@@ -9,9 +9,9 @@ public class PrimitiveValue extends ValueType
 
 	private final PrimitiveInfo valueInfo;
 
-	public PrimitiveValue(PrimitiveInfo valueInfo)
+	public PrimitiveValue(PrimitiveInfo valueInfo, String name)
 	{
-		super(TypeInfo.PRIMITIV);
+		super(TypeInfo.PRIMITIV, name);
 		this.valueInfo= valueInfo;
 
 	}

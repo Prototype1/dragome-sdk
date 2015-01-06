@@ -17,7 +17,7 @@ public enum PrimitiveInfo
 	{
 		return type;
 	}
-
+	
 	public static PrimitiveInfo createFromAsmType(Type t)
 	{
 		int type= t.getSort();
